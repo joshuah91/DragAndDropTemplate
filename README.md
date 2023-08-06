@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+description:
+
+A drag and drop component using nextjs project with a backend simulation using JSON object, that we can update so data can persist after refresh
+
 ## Getting Started
 
 First, run the development server:
