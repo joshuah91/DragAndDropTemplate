@@ -8,7 +8,6 @@ import {
   SortableHandle,
 } from "react-sortable-hoc";
 import { Table } from "antd";
-import { readFromFile } from "@/lib/localData";
 
 export default function Home() {
   const DragHandle = SortableHandle(() => (
@@ -186,7 +185,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-6">
-      <Grid container maxWidth={"xl"} height={"100%"}>
+      <Grid container maxWidth={"auto"} height={"100%"}>
         <Grid
           container
           id="nav"
@@ -417,11 +416,3 @@ export default function Home() {
     </main>
   );
 }
-
-// export async function getStaticProps() {
-//   const localData = await readFromFile();
-
-//   return {
-//     props: { localData },
-//   };
-// }
