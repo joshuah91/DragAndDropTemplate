@@ -1169,7 +1169,7 @@ export default function Home() {
           </Modal>
 
           {/* RESET MODAL */}
-          {/* <Modal
+          <Modal
             open={isResetModalOpen}
             onOk={() => {
               setIsResetModalOpen(false);
@@ -1329,7 +1329,7 @@ export default function Home() {
                 </p>
               </Grid>
             </Grid>
-          </Modal> */}
+          </Modal>
         </Grid>
       </Grid>
     </main>
