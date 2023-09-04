@@ -5,21 +5,11 @@ const dataFilePath = path.join(process.cwd(), "json/users.json");
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    try {
-      // Read the existing data from the JSON file
-      const jsonData = await fsPromises.readFile(dataFilePath);
-      const objectData = JSON.parse(jsonData);
+    // Read the existing data from the JSON file
+    const jsonData = await fsPromises.readFile(dataFilePath);
+    const objectData = JSON.parse(jsonData);
 
-      res.status(200).json(objectData);
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        response: false,
-        status: 500,
-        message: "Error fetching data",
-      });
-    }
+    res.status(200).json(objectData);
   } else if (req.method === "POST") {
     try {
       // Read the existing data from the JSON file
