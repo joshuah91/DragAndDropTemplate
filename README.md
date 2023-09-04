@@ -4,6 +4,8 @@ description:
 
 A drag and drop component using nextjs project with a backend simulation using JSON object, that we can update so data can persist after refresh
 
+DEMO: https://dragandroptemplate.vercel.app/
+
 ## Running dependency installation
 use the following command
 
