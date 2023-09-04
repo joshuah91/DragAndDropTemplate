@@ -4,6 +4,12 @@ description:
 
 A drag and drop component using nextjs project with a backend simulation using JSON object, that we can update so data can persist after refresh
 
+## Running dependency installation
+use the following command
+
+```bash
+npm install --legacy-peer-deps
+
 ## Getting Started
 
 First, run the development server:

@@ -296,7 +296,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-6">
-      <Grid container maxWidth={"xl"} height={"100%"}>
+      <Grid container maxWidth={"auto"} height={"100%"}>
         {/* NAV */}
         <Grid
           container
@@ -1335,11 +1335,3 @@ export default function Home() {
     </main>
   );
 }
-
-// export async function getStaticProps() {
-//   const localData = await readFromFile();
-
-//   return {
-//     props: { localData },
-//   };
-// }
