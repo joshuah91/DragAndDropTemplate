@@ -89,15 +89,31 @@ export default function Home() {
 
   // fetch data from storage json object
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("/api/storeData");
-      const data = await response.json();
-      setDataSource(data);
-    };
-    fetchData();
+    const l = localStorage.getItem("data");
+    if (l !== null) {
+      const local = JSON.parse(l);
+      setDataSource(local);
+    } else {
+      const fetchData = async () => {
+        const response = await fetch("/api/storeData");
+        const data = await response.json();
+        localStorage.setItem("data", JSON.stringify(data));
+        setDataSource(data);
+      };
+      fetchData();
+    }
   }, [dataChanged]);
 
+  // const getStorage = () => {
+  //   const l = localStorage.getItem("data");
+  //   if (l !== null) {
+  //     const local = JSON.parse(l);
+  //     setDataSource(local);
+  //   } else return null;
+  // };
+
   // table columns
+
   const getColumns = () => {
     return [
       {
@@ -225,36 +241,42 @@ export default function Home() {
         tempDataSource = [...newData];
         tempDataSource = merge(tempDataSource, filteredItems, newIndex);
       }
-
+      const local = localStorage.setItem(
+        "data",
+        JSON.stringify(tempDataSource)
+      );
       setDataSource(tempDataSource);
       setSelectedItems([]);
-      fetch("/api/storeData", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(tempDataSource),
-      })
-        .then((res) => {
-          res.json().then((res) => {
-            if (res.response === true) {
-              setDataChanged(!dataChanged);
-            } else if (res.response === false) {
-              console.log(res.message);
-              swal({
-                icon: "error",
-                text: res.message,
-              });
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          swal({
-            icon: "error",
-            text: "Something went wrong. Please try again later!",
-          });
-        });
+      localStorage.setItem("data", JSON.stringify(tempDataSource));
+      setDataChanged(!dataChanged);
+
+      // fetch("/api/storeData", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(tempDataSource),
+      // })
+      //   .then((res) => {
+      //     res.json().then((res) => {
+      //       if (res.response === true) {
+      //         setDataChanged(!dataChanged);
+      //       } else if (res.response === false) {
+      //         console.log(res.message);
+      //         swal({
+      //           icon: "error",
+      //           text: res.message,
+      //         });
+      //       }
+      //     });
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     swal({
+      //       icon: "error",
+      //       text: "Something went wrong. Please try again later!",
+      //     });
+      //   });
     }
   };
 
@@ -620,8 +642,14 @@ export default function Home() {
                           .join(" ");
                         const d = new Date().toISOString();
                         const date = d.slice(0, d.length - 5);
+                        const highestUserId = tempDataSource.reduce(
+                          (prev, curr) => {
+                            return prev.user_id > curr.user_id ? prev : curr;
+                          }
+                        );
+                        console.log("str", highestUserId);
                         let newEmployee = {
-                          user_id: tempDataSource.length + 1,
+                          user_id: highestUserId.user_id + 1,
                           fullname: string,
                           priority: priority,
                           created_at: date,
@@ -630,44 +658,61 @@ export default function Home() {
                         tempDataSource.push(newEmployee);
                         setDataSource(tempDataSource);
                         console.log("str", tempDataSource);
-                        fetch("/api/storeData", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify(tempDataSource),
-                        })
-                          .then((res) => {
-                            res.json().then((res) => {
-                              if (res.response === true) {
-                                swal({
-                                  icon: "success",
-                                  title: "Success!",
-                                  text: `Employee has been successfully created. You can now breathe a sigh of relief as the task is complete.`,
-                                  buttons: [false, "Ok, thanks"],
-                                });
-                                setDataChanged(!dataChanged);
-                                setIsAddModalOpen(false);
-                                setFullName("");
-                                setPriority(null);
-                                setNameError(false);
-                                setPriorityError(false);
-                              } else if (res.response === false) {
-                                console.log(res);
-                                swal({
-                                  icon: "error",
-                                  text: res.message,
-                                });
-                              }
-                            });
-                          })
-                          .catch((err) => {
-                            console.error(err);
-                            swal({
-                              icon: "error",
-                              text: "Something went wrong. Please try again later!",
-                            });
-                          });
+                        localStorage.setItem(
+                          "data",
+                          JSON.stringify(tempDataSource)
+                        );
+                        swal({
+                          icon: "success",
+                          title: "Success!",
+                          text: `Employee has been successfully created. You can now breathe a sigh of relief as the task is complete.`,
+                          buttons: [false, "Ok, thanks"],
+                        });
+                        setDataChanged(!dataChanged);
+                        setIsAddModalOpen(false);
+                        setFullName("");
+                        setPriority(null);
+                        setNameError(false);
+                        setPriorityError(false);
+
+                        // fetch("/api/storeData", {
+                        //   method: "POST",
+                        //   headers: {
+                        //     "Content-Type": "application/json",
+                        //   },
+                        //   body: JSON.stringify(tempDataSource),
+                        // })
+                        //   .then((res) => {
+                        //     res.json().then((res) => {
+                        //       if (res.response === true) {
+                        //         swal({
+                        //           icon: "success",
+                        //           title: "Success!",
+                        //           text: `Employee has been successfully created. You can now breathe a sigh of relief as the task is complete.`,
+                        //           buttons: [false, "Ok, thanks"],
+                        //         });
+                        //         setDataChanged(!dataChanged);
+                        //         setIsAddModalOpen(false);
+                        //         setFullName("");
+                        //         setPriority(null);
+                        //         setNameError(false);
+                        //         setPriorityError(false);
+                        //       } else if (res.response === false) {
+                        //         console.log(res);
+                        //         swal({
+                        //           icon: "error",
+                        //           text: res.message,
+                        //         });
+                        //       }
+                        //     });
+                        //   })
+                        //   .catch((err) => {
+                        //     console.error(err);
+                        //     swal({
+                        //       icon: "error",
+                        //       text: "Something went wrong. Please try again later!",
+                        //     });
+                        //   });
                       } else {
                         swal({
                           icon: "error",
@@ -864,26 +909,33 @@ export default function Home() {
                           }
                         });
                         setDataSource(tempDataSource);
-                        fetch("/api/storeData", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify(tempDataSource),
-                        })
-                          .then((res) => {
-                            res.json().then((res) => {
-                              setDataChanged(!dataChanged);
-                              setIsEditModalOpen(false);
-                            });
-                          })
-                          .catch((err) => {
-                            console.error(err);
-                            swal({
-                              icon: "error",
-                              text: "Something went wrong. Please try again later!",
-                            });
-                          });
+                        localStorage.setItem(
+                          "data",
+                          JSON.stringify(tempDataSource)
+                        );
+                        setDataChanged(!dataChanged);
+                        setIsEditModalOpen(false);
+
+                        // fetch("/api/storeData", {
+                        //   method: "POST",
+                        //   headers: {
+                        //     "Content-Type": "application/json",
+                        //   },
+                        //   body: JSON.stringify(tempDataSource),
+                        // })
+                        //   .then((res) => {
+                        //     res.json().then((res) => {
+                        //       setDataChanged(!dataChanged);
+                        //       setIsEditModalOpen(false);
+                        //     });
+                        //   })
+                        //   .catch((err) => {
+                        //     console.error(err);
+                        //     swal({
+                        //       icon: "error",
+                        //       text: "Something went wrong. Please try again later!",
+                        //     });
+                        //   });
                       } else {
                         swal({
                           icon: "error",
@@ -1073,40 +1125,53 @@ export default function Home() {
                         }
                       });
                       setDataSource(tempDataSource);
-                      fetch("/api/storeData", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(tempDataSource),
-                      })
-                        .then((res) => {
-                          const d = res.json().then((res) => {
-                            if (res.response === true) {
-                              swal({
-                                icon: "success",
-                                title: "Success!",
-                                text: `${record.fullname} has been successfully deleted. You can now breathe a sigh of relief as the task is complete.`,
-                                buttons: [false, "Ok, thanks"],
-                              });
-                              setDataChanged(!dataChanged);
-                              setIsDeleteModalOpen(false);
-                            } else if (res.response === false) {
-                              console.log(res);
-                              swal({
-                                icon: "error",
-                                text: res.message,
-                              });
-                            }
-                          });
-                        })
-                        .catch((err) => {
-                          console.error(err);
-                          swal({
-                            icon: "error",
-                            text: "Something went wrong. Please try again later!",
-                          });
-                        });
+                      localStorage.setItem(
+                        "data",
+                        JSON.stringify(tempDataSource)
+                      );
+                      swal({
+                        icon: "success",
+                        title: "Success!",
+                        text: `${record.fullname} has been successfully deleted. You can now breathe a sigh of relief as the task is complete.`,
+                        buttons: [false, "Ok, thanks"],
+                      });
+                      setDataChanged(!dataChanged);
+                      setIsDeleteModalOpen(false);
+
+                      // fetch("/api/storeData", {
+                      //   method: "POST",
+                      //   headers: {
+                      //     "Content-Type": "application/json",
+                      //   },
+                      //   body: JSON.stringify(tempDataSource),
+                      // })
+                      //   .then((res) => {
+                      //     const d = res.json().then((res) => {
+                      //       if (res.response === true) {
+                      //         swal({
+                      //           icon: "success",
+                      //           title: "Success!",
+                      //           text: `${record.fullname} has been successfully deleted. You can now breathe a sigh of relief as the task is complete.`,
+                      //           buttons: [false, "Ok, thanks"],
+                      //         });
+                      //         setDataChanged(!dataChanged);
+                      //         setIsDeleteModalOpen(false);
+                      //       } else if (res.response === false) {
+                      //         console.log(res);
+                      //         swal({
+                      //           icon: "error",
+                      //           text: res.message,
+                      //         });
+                      //       }
+                      //     });
+                      //   })
+                      //   .catch((err) => {
+                      //     console.error(err);
+                      //     swal({
+                      //       icon: "error",
+                      //       text: "Something went wrong. Please try again later!",
+                      //     });
+                      //   });
                     }}
                   >
                     Yes, Delete
@@ -1224,40 +1289,52 @@ export default function Home() {
                       padding: "0px 15px",
                     }}
                     onClick={() => {
-                      let tempDataSource: any[] = [];
-                      // const fetchData = async () => {
+                      // let tempDataSource: any[] = [];
                       fetch("/api/originalStoreData")
                         .then((res) => {
                           res.json().then((response) => {
                             setDataSource(response);
-                            fetch("/api/storeData", {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify(response),
-                            })
-                              .then((res) => {
-                                const d = res.json().then((res) => {
-                                  if (res.response === true) {
-                                    swal({
-                                      icon: "success",
-                                      title: "Success!",
-                                      text: `List has been successfully reset! You can now breathe a sigh of relief as the task is complete.`,
-                                      buttons: [false, "Ok, thanks"],
-                                    });
-                                    setDataChanged(!dataChanged);
-                                    setIsResetModalOpen(false);
-                                  }
-                                });
-                              })
-                              .catch((error) => {
-                                console.error(error);
-                                swal({
-                                  icon: "error",
-                                  text: "Something went wrong. Please try again later!",
-                                });
-                              });
+                            localStorage.setItem(
+                              "data",
+                              JSON.stringify(response)
+                            );
+                            swal({
+                              icon: "success",
+                              title: "Success!",
+                              text: `List has been successfully reset! You can now breathe a sigh of relief as the task is complete.`,
+                              buttons: [false, "Ok, thanks"],
+                            });
+                            setDataChanged(!dataChanged);
+                            setIsResetModalOpen(false);
+
+                            // fetch("/api/storeData", {
+                            //   method: "POST",
+                            //   headers: {
+                            //     "Content-Type": "application/json",
+                            //   },
+                            //   body: JSON.stringify(response),
+                            // })
+                            //   .then((res) => {
+                            //     const d = res.json().then((res) => {
+                            //       if (res.response === true) {
+                            //         swal({
+                            //           icon: "success",
+                            //           title: "Success!",
+                            //           text: `List has been successfully reset! You can now breathe a sigh of relief as the task is complete.`,
+                            //           buttons: [false, "Ok, thanks"],
+                            //         });
+                            //         setDataChanged(!dataChanged);
+                            //         setIsResetModalOpen(false);
+                            //       }
+                            //     });
+                            //   })
+                            //   .catch((error) => {
+                            //     console.error(error);
+                            //     swal({
+                            //       icon: "error",
+                            //       text: "Something went wrong. Please try again later!",
+                            //     });
+                            //   });
                           });
                         })
                         .catch((error) => {
@@ -1267,9 +1344,6 @@ export default function Home() {
                             text: "Something went wrong. Please try again later!",
                           });
                         });
-                      // console.log("str", tempDataSource);
-                      // };
-                      // fetchData();
                     }}
                   >
                     Yes, Reset
